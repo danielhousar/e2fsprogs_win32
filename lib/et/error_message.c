@@ -224,6 +224,7 @@ static void init_debug(void)
 		debug_f = fopen(fn, "a");
 	if (!debug_f)
 		debug_f = fopen("/dev/tty", "a");
+	/*
 	if (debug_f) {
 		fd = fileno(debug_f);
 		if (fd >= 0) {
@@ -232,8 +233,8 @@ static void init_debug(void)
 				fcntl(fd, F_SETFD, flags | FD_CLOEXEC);
 		}
 	} else
-		debug_mask = DEBUG_INIT;
-
+	*/
+	debug_mask = DEBUG_INIT;
 }
 
 /*
