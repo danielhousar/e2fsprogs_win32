@@ -26,7 +26,8 @@
 #include <unistd.h>
 #endif
 #include <fcntl.h>
-#include <sys/ioctl.h>
+//#include <sys/ioctl.h>
+#include <io.h>
 
 #include "e2p.h"
 
@@ -59,7 +60,8 @@ int fsetversion (const char * name, unsigned long version)
 #endif
 #else /* ! HAVE_EXT2_IOCTLS */
 	extern int errno;
-	errno = EOPNOTSUPP;
+	//errno = EOPNOTSUPP;
+	errno = ENOSYS;
 	return -1;
 #endif /* ! HAVE_EXT2_IOCTLS */
 }
