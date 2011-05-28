@@ -17,14 +17,15 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <string.h>
-#include <grp.h>
-#include <pwd.h>
+//#include <grp.h>
+//#include <pwd.h>
 #include <time.h>
 
 #include "e2p.h"
 
 static void print_user (unsigned short uid, FILE *f)
 {
+	/*
 	struct passwd *pw;
 
 	fprintf(f, "%u ", uid);
@@ -33,10 +34,13 @@ static void print_user (unsigned short uid, FILE *f)
 		fprintf(f, "(user unknown)\n");
 	else
 		fprintf(f, "(user %s)\n", pw->pw_name);
+	*/
+	fprintf(f, "%u ", uid);
 }
 
 static void print_group (unsigned short gid, FILE *f)
 {
+	/*
 	struct group *gr;
 
 	fprintf(f, "%u ", gid);
@@ -45,6 +49,8 @@ static void print_group (unsigned short gid, FILE *f)
 		fprintf(f, "(group unknown)\n");
 	else
 		fprintf(f, "(group %s)\n", gr->gr_name);
+	*/
+	fprintf(f, "%u ", gid);
 }
 
 #define MONTH_INT (86400 * 30)
