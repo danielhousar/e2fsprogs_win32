@@ -69,6 +69,7 @@ int setflags (int fd, unsigned long flags)
 	return ioctl (fd, EXT2_IOC_SETFLAGS, &f);
 #endif /* HAVE_EXT2_IOCTLS */
 #endif
-	errno = EOPNOTSUPP;
+	//errno = EOPNOTSUPP;
+	errno = ENOSYS;
 	return -1;
 }
