@@ -329,7 +329,8 @@ errcode_t ext2fs_bmap(ext2_filsys fs, ext2_ino_t ino, struct ext2_inode *inode,
 	if (ret)
 		return ret;
 	if (ret_blk >= ((long long) 1 << 32))
-		return EOVERFLOW;
+		//return EOVERFLOW;
+		return EFAULT;
 	*phys_blk = ret_blk;
 	return 0;
 }
