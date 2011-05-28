@@ -8,6 +8,7 @@ FILES
 patches
 Makefile
 *.o
+*.exe
 MCONFIG
 asm_types.h
 config.log
@@ -15,18 +16,6 @@ config.status
 debugfs/debug_cmds.c
 debugfs/debugfs
 debugfs/debugfs.8
-doc/libext2fs.aux
-doc/libext2fs.cp
-doc/libext2fs.dvi
-doc/libext2fs.fn
-doc/libext2fs.fns
-doc/libext2fs.info
-doc/libext2fs.ky
-doc/libext2fs.log
-doc/libext2fs.pg
-doc/libext2fs.toc
-doc/libext2fs.tp
-doc/libext2fs.vr
 e2fsck/crc32table.h
 e2fsck/e2fsck
 e2fsck/e2fsck.8
