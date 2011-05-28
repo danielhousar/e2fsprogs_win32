@@ -331,8 +331,9 @@ const char *tdb_errorstr(struct tdb_context *tdb)
 
    note that a len of zero means lock to end of file
 */
-int tdb_brlock(struct tdb_context *tdb, tdb_off_t offset,
-	       int rw_type, int lck_type, int probe, size_t len)
+
+//TODO: reimplement tdb_brlock for win32
+int tdb_brlock(struct tdb_context *tdb, tdb_off_t offset, int rw_type, int lck_type, int probe, size_t len)
 {
 	struct flock fl;
 	int ret;
