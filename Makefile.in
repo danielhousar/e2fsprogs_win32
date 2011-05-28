@@ -25,7 +25,6 @@ TAR=tar
 all:: subs
 	$(MAKE) libs
 	$(MAKE) progs
-	$(MAKE) docs
 
 subs: $(DEP_SUBSTITUTE)
 	@for i in $(SUBS) ; do if test -d `dirname $$i` ; \
@@ -105,11 +104,11 @@ all-libs-recursive install-libs-recursive install-strip-libs-recursive \
 mostlyclean: mostlyclean-recursive mostlyclean-local
 
 clean: clean-recursive clean-local clean-doc
-	$(RM) -f $(SUBS) 
+	$(RM) -f $(SUBS)
 
 distclean: distclean-doc distclean-recursive
 	$(RM) -rf autom4te.cache e2fsprogs.spec ext2ed/Makefile po/stamp-po
-	$(MAKE) distclean-local 
+	$(MAKE) distclean-local
 
 realclean: realclean-recursive realclean-local
 
@@ -128,7 +127,7 @@ lib/uuid/uuid_types.h: $(DEP_SUBSTITUTE) asm_types.h \
 	cd $(top_builddir); CONFIG_FILES=./lib/uuid/uuid_types.h ./config.status
 
 mostlyclean-local:
-	$(RM) -f \#* *~ *.orig core MAKELOG 
+	$(RM) -f \#* *~ *.orig core MAKELOG
 
 clean-local: mostlyclean-local
 
