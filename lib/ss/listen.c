@@ -44,7 +44,7 @@ static sigret_t listen_int_handler(int sig __SS_ATTR((unused)))
     signal(SIGINT, listen_int_handler);
     longjmp(listen_jmpb, 1);
 }
-
+/*
 int ss_listen (int sci_idx)
 {
     char *cp;
@@ -125,7 +125,7 @@ egress:
     current_info = old_info;
     return code;
 }
-
+*/
 void ss_abort_subsystem(int sci_idx, int code)
 {
     ss_info(sci_idx)->abort = 1;
