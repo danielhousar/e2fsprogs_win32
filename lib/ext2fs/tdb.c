@@ -364,8 +364,7 @@ int tdb_brlock(struct tdb_context *tdb, tdb_off_t offset, int rw_type, int lck_t
 		if (!probe && lck_type != F_SETLK) {
 			/* Ensure error code is set for log fun to examine. */
 			tdb->ecode = TDB_ERR_LOCK;
-			TDB_LOG((tdb, TDB_DEBUG_TRACE,"tdb_brlock failed (fd=%d) at offset %d rw_type=%d lck_type=%d len=%d\n",
-				 tdb->fd, offset, rw_type, lck_type, (int)len));
+			TDB_LOG((tdb, TDB_DEBUG_TRACE,"tdb_brlock failed (fd=%d) at offset %d rw_type=%d lck_type=%d len=%d\n", tdb->fd, offset, rw_type, lck_type, (int)len));
 		}
 		return TDB_ERRCODE(TDB_ERR_LOCK, -1);
 	}
