@@ -28,6 +28,7 @@
 #include <errno.h>
 #endif
 #include <fcntl.h>
+#define O_DIRECT	00040000 /* direct disk access hint - currently ignored */
 #include <time.h>
 #ifdef __linux__
 #include <sys/utsname.h>
