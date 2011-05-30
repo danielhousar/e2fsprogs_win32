@@ -17,6 +17,7 @@ Compillable by MinGW GCC (>= 4.4.0) under Msys environment (Win32 + Bash + unix 
 	lib/et:		libcomm_err.a
 	lib/ext2fs:	libext2fs.a
 	lib/blkid:	libblkid.a
+	e2fsck: *.o
 
 Substitute binaries:
 	(origin) - (substitute)
