@@ -883,10 +883,11 @@ static errcode_t PRS(int argc, char *argv[], e2fsck_t *ret_ctx)
 				  "not be both used at the same time.\n"));
 		exit(FSCK_USAGE);
 	}
+/*
 #ifdef HAVE_SIGNAL_H
-	/*
+	*
 	 * Set up signal action
-	 */
+	 *
 	memset(&sa, 0, sizeof(struct sigaction));
 	sa.sa_handler = signal_cancel;
 	sigaction(SIGINT, &sa, 0);
@@ -900,6 +901,7 @@ static errcode_t PRS(int argc, char *argv[], e2fsck_t *ret_ctx)
 	sa.sa_handler = signal_progress_off;
 	sigaction(SIGUSR2, &sa, 0);
 #endif
+*/
 
 	/* Update our PATH to include /sbin if we need to run badblocks  */
 	if (cflag) {

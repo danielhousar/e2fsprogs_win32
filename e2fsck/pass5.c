@@ -13,7 +13,7 @@
 #include <stdint.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/ioctl.h>
+#include <sys/io.h>
 #include <fcntl.h>
 #include <errno.h>
 
@@ -346,7 +346,7 @@ redo_counts:
 					goto errout;
 			if (csum_flag &&
 			    (i != ext2fs_blocks_count(fs->super)-1) &&
-			    ext2fs_bg_flags_test(fs, group, 
+			    ext2fs_bg_flags_test(fs, group,
 						EXT2_BG_BLOCK_UNINIT))
 				skip_group++;
 		}
