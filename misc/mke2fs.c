@@ -45,7 +45,7 @@ extern int optind;
 #ifdef HAVE_MNTENT_H
 #include <mntent.h>
 #endif
-#include <sys/ioctl.h>
+#include <io.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <libgen.h>
