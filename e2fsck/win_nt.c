@@ -652,9 +652,11 @@ static errcode_t PRS(int argc, char *argv[], e2fsck_t *ret_ctx)
 #endif
 	e2fsck_t	ctx;
 	errcode_t	retval;
+/*
 #ifdef HAVE_SIGNAL_H
 	struct sigaction	sa;
 #endif
+*/
 	char		*extended_opts = 0;
 	char		*cp;
 	int 		res;		/* result of sscanf */
