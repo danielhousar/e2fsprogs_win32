@@ -373,7 +373,7 @@ util.o: $(srcdir)/util.c $(srcdir)/e2fsck.h \
  $(top_builddir)/lib/ext2fs/ext2_err.h \
  $(top_srcdir)/lib/ext2fs/ext2_ext_attr.h $(top_srcdir)/lib/ext2fs/bitops.h \
  $(srcdir)/profile.h prof_err.h
-unix.o: $(srcdir)/win_nt.c $(top_srcdir)/lib/e2p/e2p.h \
+win_nt.o: $(srcdir)/win_nt.c $(top_srcdir)/lib/e2p/e2p.h \
  $(top_srcdir)/lib/ext2fs/ext2_fs.h $(top_builddir)/lib/ext2fs/ext2_types.h \
  $(top_srcdir)/lib/et/com_err.h $(srcdir)/e2fsck.h \
  $(top_srcdir)/lib/ext2fs/ext2fs.h $(top_srcdir)/lib/ext2fs/ext3_extents.h \
