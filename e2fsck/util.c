@@ -41,7 +41,7 @@
 extern e2fsck_t e2fsck_global_ctx;   /* Try your very best not to use this! */
 
 #include <sys/time.h>
-#include <sys/resource.h>
+//#include <sys/resource.h>
 
 void fatal_error(e2fsck_t ctx, const char *msg)
 {
@@ -343,7 +343,7 @@ void print_resource_track(e2fsck_t ctx, const char *desc,
 	       kbytes(malloc_info.uordblks), kbytes(malloc_info.fordblks));
 #else
 	printf(_("Memory used: %lu, "),
-	       (unsigned long) (((char *) sbrk(0)) - 
+	       (unsigned long) (((char *) sbrk(0)) -
 				((char *) track->brk_start)));
 #endif
 #ifdef HAVE_GETRUSAGE
