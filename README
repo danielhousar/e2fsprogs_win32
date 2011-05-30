@@ -22,6 +22,12 @@ Substitute binaries:
 	(origin) - (substitute)
 	lib/uuid: libuuid.a - MinGW: libuuid.a
 
+Linkable (with no missing symbols):
+
+Working (executable):
+
+Finalised:
+
 ***********************************************************************
 
 
