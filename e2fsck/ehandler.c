@@ -10,12 +10,12 @@
 #include <unistd.h>
 #include <string.h>
 #include <ctype.h>
-#include <termios.h>
+//#include <termios.h>
 
 #include "e2fsck.h"
 
 #include <sys/time.h>
-#include <sys/resource.h>
+//#include <sys/resource.h>
 
 static const char *operation;
 
