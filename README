@@ -1,19 +1,26 @@
-	This is the new version (1.41.14) of the second extended file
-system management programs.
+********************** E2FSPROGS for WIN32 ****************************
 
-	From time to time, I release new versions of e2fsprogs, to fix
-bugs and to make the utilities more robust.  You can always find
-information about the latest version at the the e2fsprogs web page,
-which is:
+This should by port of e2fsprogs for MS Windows. I try to rewrite
+incompatible code of e2fsprogs, but I want to let the most of code
+untouched for compatibility with original code.
 
-	http://e2fsprogs.sourceforge.net
+This port should be mergeable with original code by GIT (or at least
+something will be mergeable - for less work).
 
-	The INSTALL file has instructions on building and installing
-e2fsprogs.  Provisions for building Red Hat RPMs and Debian dpkg files
-are supplied as well.
+	---------------------------- STATUS -------------------------------
 
-	In case of bugs in these programs, please contact Ted Ts'o at
-tytso@mit.edu or tytso@alum.mit.edu.  See the e2fsck man page for
-suggestions of what sort of information to include when submitting bug
-reports for these programs.
+Now derived from: 1.41.14 (GIT: master 2011-05-15)
+
+Compillable by MinGW GCC (>= 4.4.0) under Msys environment (Win32 + Bash + unix paths):
+
+	lib/e2p:	libe2p.a
+	lib/et:		libcomm_err.a
+	lib/blkid:	libblkid.a
+
+Substitute binaries:
+
+	lib/uuid: libuuid.a - MinGW: libuuid.a
+
+***********************************************************************
+
 
