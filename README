@@ -11,10 +11,15 @@ something will be mergeable - for less work).
 
 Now derived from: 1.41.14 (GIT: master 2011-05-15)
 
-Status description:
+Description:
 	- mostly compillable (with some rewrites of Makefiles)
 	- compillable all main needed binaries (libext2fs, mke2fs, e2fsck)
 	- not linkable: missing symbols errors (maybe bad or missing exports)
+
+TODO:
+	- solve mising-symbol errors during link
+	- make mke2fs and e2fsck compatible with NT disk-IO ABI
+	- test mke2fs if making Ext4fs on partition correctly
 
 Compillable by MinGW GCC (>= 4.4.0) under Msys environment (Win32 + Bash + unix paths):
 
