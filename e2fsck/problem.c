@@ -13,7 +13,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <ctype.h>
-#include <termios.h>
+//#include <termios.h>
 
 #include "e2fsck.h"
 

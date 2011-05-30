@@ -89,7 +89,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <ctype.h>
-#include <termios.h>
+//#include <termios.h>
 
 #include "e2fsck.h"
 
@@ -293,7 +293,7 @@ static _INLINE_ void expand_inode_expression(ext2_filsys fs, char ch,
 		break;
 	case 'b':
 		if (fs->super->s_feature_ro_compat &
-		    EXT4_FEATURE_RO_COMPAT_HUGE_FILE) 
+		    EXT4_FEATURE_RO_COMPAT_HUGE_FILE)
 			printf("%llu", inode->i_blocks +
 			       (((long long) inode->osd2.linux2.l_i_blocks_hi)
 				<< 32));
