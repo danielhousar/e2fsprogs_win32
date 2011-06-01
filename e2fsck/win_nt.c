@@ -1168,7 +1168,7 @@ failure:
 		__u32 blocksize = EXT2_BLOCK_SIZE(fs->super);
 		int need_restart = 0;
 
-		pctx.errcode = ext2fs_get_device_size2(ctx->filesystem_name,
+		pctx.errcode = ext2fs_get_device_size(ctx->filesystem_name,
 						       blocksize,
 						       &ctx->num_blocks);
 		/*
@@ -1182,7 +1182,7 @@ failure:
 			ext2fs_close(fs);
 			need_restart++;
 			pctx.errcode =
-				ext2fs_get_device_size2(ctx->filesystem_name,
+				ext2fs_get_device_size(ctx->filesystem_name,
 							blocksize,
 							&ctx->num_blocks);
 		}
