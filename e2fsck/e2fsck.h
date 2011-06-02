@@ -61,6 +61,9 @@
 #define P_(singular, plural, n) ((n) == 1 ? (singular) : (plural))
 #endif
 
+#include <windows.h>
+#include <winsock2.h>
+
 /*
  * Exit codes used by fsck-type programs
  */

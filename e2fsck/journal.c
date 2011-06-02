@@ -344,8 +344,7 @@ static errcode_t e2fsck_get_journal(e2fsck_t ctx, journal_t **ret_journal)
 			char uuid[37];
 
 			uuid_unparse(sb->s_journal_uuid, uuid);
-			ctx->journal_name = blkid_get_devname(ctx->blkid,
-							      "UUID", uuid);
+			ctx->journal_name = blkid_get_devname(ctx->blkid, "UUID", uuid);
 			if (!ctx->journal_name)
 				ctx->journal_name = blkid_devno_to_devname(sb->s_journal_dev);
 		}
@@ -590,7 +589,7 @@ static void e2fsck_journal_reset_super(e2fsck_t ctx, journal_superblock_t *jsb,
 {
 	char *p;
 	union {
-		uuid_t uuid;
+		uuuid_t uuid;
 		__u32 val[4];
 	} u;
 	__u32 new_seq = 0;
