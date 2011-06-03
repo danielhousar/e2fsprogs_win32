@@ -34,7 +34,7 @@
 
 #include "uuidP.h"
 
-void uuid_copy(uuid_t dst, const uuid_t src)
+void uuid_copy(e2uuid_t dst, const e2uuid_t src)
 {
 	unsigned char		*cp1;
 	const unsigned char	*cp2;

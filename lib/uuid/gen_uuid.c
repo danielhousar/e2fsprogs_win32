@@ -396,7 +396,7 @@ try_again:
 
 	if (state_fd > 0) {
 		rewind(state_f);
-		len = fprintf(state_f, 
+		len = fprintf(state_f,
 			      "clock: %04x tv: %016lu %08lu adj: %08d\n",
 			      clock_seq, last.tv_sec, last.tv_usec, adjustment);
 		fflush(state_f);
@@ -472,7 +472,7 @@ static void close_all_fds(void)
  *
  * Returns 0 on success, non-zero on failure.
  */
-static int get_uuid_via_daemon(int op, uuid_t out, int *num)
+static int get_uuid_via_daemon(int op, e2uuid_t out, int *num)
 {
 #if defined(USE_UUIDD) && defined(HAVE_SYS_UN_H)
 	char op_buf[64];
@@ -550,7 +550,7 @@ fail:
 	return -1;
 }
 
-void uuid__generate_time(uuid_t out, int *num)
+void uuid__generate_time(e2uuid_t out, int *num)
 {
 	static unsigned char node_id[6];
 	static int has_init = 0;
@@ -577,7 +577,7 @@ void uuid__generate_time(uuid_t out, int *num)
 	uuid_pack(&uu, out);
 }
 
-void uuid_generate_time(uuid_t out)
+void uuid_generate_time(e2uuid_t out)
 {
 #ifdef TLS
 	THREAD_LOCAL int		num = 0;
@@ -621,9 +621,9 @@ void uuid_generate_time(uuid_t out)
 }
 
 
-void uuid__generate_random(uuid_t out, int *num)
+void uuid__generate_random(e2uuid_t out, int *num)
 {
-	uuid_t	buf;
+	e2uuid_t	buf;
 	struct uuid uu;
 	int i, n;
 
@@ -640,11 +640,11 @@ void uuid__generate_random(uuid_t out, int *num)
 		uu.time_hi_and_version = (uu.time_hi_and_version & 0x0FFF)
 			| 0x4000;
 		uuid_pack(&uu, out);
-		out += sizeof(uuid_t);
+		out += sizeof(e2uuid_t);
 	}
 }
 
-void uuid_generate_random(uuid_t out)
+void uuid_generate_random(e2uuid_t out)
 {
 	int	num = 1;
 	/* No real reason to use the daemon for random uuid's -- yet */
@@ -659,7 +659,7 @@ void uuid_generate_random(uuid_t out)
  * /dev/urandom is available, since otherwise we won't have
  * high-quality randomness.
  */
-void uuid_generate(uuid_t out)
+void uuid_generate(e2uuid_t out)
 {
 	if (get_random_fd() >= 0)
 		uuid_generate_random(out);
