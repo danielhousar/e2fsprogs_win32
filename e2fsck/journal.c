@@ -589,7 +589,7 @@ static void e2fsck_journal_reset_super(e2fsck_t ctx, journal_superblock_t *jsb,
 {
 	char *p;
 	union {
-		uuuid_t uuid;
+		e2uuid_t uuid;
 		__u32 val[4];
 	} u;
 	__u32 new_seq = 0;

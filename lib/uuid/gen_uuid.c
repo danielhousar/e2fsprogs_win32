@@ -54,10 +54,10 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <sys/types.h>
-#ifdef HAVE_SYS_TIME_H
-#include <sys/time.h>
-#endif
-#include <sys/wait.h>
+//#ifdef HAVE_SYS_TIME_H
+//#include <sys/time.h>
+//#endif
+//#include <sys/wait.h>
 #include <sys/stat.h>
 #ifdef HAVE_SYS_FILE_H
 #include <sys/file.h>
@@ -311,7 +311,7 @@ static int get_clock(uint32_t *clock_high, uint32_t *clock_low,
 	THREAD_LOCAL FILE		*state_f;
 	THREAD_LOCAL uint16_t		clock_seq;
 	struct timeval 			tv;
-	struct flock			fl;
+	//struct flock			fl;
 	uint64_t			clock_reg;
 	mode_t				save_umask;
 	int				len;

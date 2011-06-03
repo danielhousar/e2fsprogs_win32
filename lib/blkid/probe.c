@@ -125,7 +125,7 @@ static int check_mdraid(int fd, unsigned char *ret_uuid)
 	return 0;
 }
 
-static void set_uuid(blkid_dev dev, uuid_t uuid, const char *tag)
+static void set_uuid(blkid_dev dev, e2uuid_t uuid, const char *tag)
 {
 	char	str[37];
 
@@ -331,7 +331,7 @@ static int probe_ext4dev(struct blkid_probe *probe,
 	    EXT3_FEATURE_INCOMPAT_JOURNAL_DEV)
 		return -BLKID_ERR_PARAM;
 
-	/* 
+	/*
 	 * If the filesystem does not have a journal and ext2 and ext4
 	 * is not present, then force this to be detected as an
 	 * ext4dev filesystem.
@@ -375,7 +375,7 @@ static int probe_ext4(struct blkid_probe *probe, struct blkid_magic *id,
 	    EXT3_FEATURE_INCOMPAT_JOURNAL_DEV)
 		return -BLKID_ERR_PARAM;
 
-	/* 
+	/*
 	 * If the filesystem does not have a journal and ext2 is not
 	 * present, then force this to be detected as an ext2
 	 * filesystem.
@@ -453,7 +453,7 @@ static int probe_ext2(struct blkid_probe *probe, struct blkid_magic *id,
 	     EXT2_FEATURE_INCOMPAT_UNSUPPORTED))
 		return -BLKID_ERR_PARAM;
 
-	/* 
+	/*
 	 * If ext2 is not present, but ext4 or ext4dev are, then
 	 * disclaim we are ext2
 	 */
@@ -1562,7 +1562,7 @@ blkid_dev blkid_verify(blkid_cache cache, blkid_dev dev)
 try_again:
 	type = 0;
 	if (!dev->bid_type || !strcmp(dev->bid_type, "mdraid")) {
-		uuid_t	uuid;
+		e2uuid_t	uuid;
 
 		if (check_mdraid(probe.fd, uuid) == 0) {
 			set_uuid(dev, uuid, 0);
