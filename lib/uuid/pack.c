@@ -35,7 +35,7 @@
 #include <string.h>
 #include "uuidP.h"
 
-void uuid_pack(const struct uuid *uu, uuid_t ptr)
+void uuid_pack(const struct uuid *uu, e2uuid_t ptr)
 {
 	uint32_t	tmp;
 	unsigned char	*out = ptr;

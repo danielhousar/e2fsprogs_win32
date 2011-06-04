@@ -39,7 +39,7 @@
 
 #include "uuidP.h"
 
-int uuid_parse(const char *in, uuid_t uu)
+int uuid_parse(const char *in, e2uuid_t uu)
 {
 	struct uuid	uuid;
 	int 		i;

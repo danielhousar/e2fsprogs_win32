@@ -115,7 +115,7 @@ prof_err.c prof_err.h: prof_err.et
 
 e2fsck: $(OBJS)  $(DEPLIBS)
 	$(E) "	LD $@"
-	$(Q) $(LD) $(ALL_LDFLAGS) -o e2fsck $(OBJS) $(LIBS)
+	$(Q) $(LD) $(ALL_LDFLAGS) -o e2fsck.exe $(OBJS) $(LIBS) -lws2_32 --enable-stdcall-fixup
 
 e2fsck.static: $(OBJS) $(STATIC_DEPLIBS)
 	$(E) "	LD $@"

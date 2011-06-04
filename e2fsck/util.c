@@ -14,9 +14,6 @@
 #include <unistd.h>
 #include <string.h>
 #include <ctype.h>
-#ifdef __linux__
-#include <sys/utsname.h>
-#endif
 
 #ifdef HAVE_CONIO_H
 #undef HAVE_TERMIOS_H
@@ -41,7 +38,14 @@
 extern e2fsck_t e2fsck_global_ctx;   /* Try your very best not to use this! */
 
 #include <sys/time.h>
-//#include <sys/resource.h>
+
+int e2_strnlen(const char *s, int count){
+	const char *cp = s;
+
+	while (count-- && *cp)
+		cp++;
+	return cp - s;
+}
 
 void fatal_error(e2fsck_t ctx, const char *msg)
 {
@@ -93,21 +97,6 @@ char *string_copy(e2fsck_t ctx EXT2FS_ATTR((unused)),
 	}
 	return ret;
 }
-
-#ifndef HAVE_STRNLEN
-/*
- * Incredibly, libc5 doesn't appear to have strnlen.  So we have to
- * provide our own.
- */
-int e2fsck_strnlen(const char * s, int count)
-{
-	const char *cp = s;
-
-	while (count-- && *cp)
-		cp++;
-	return cp - s;
-}
-#endif
 
 #ifndef HAVE_CONIO_H
 static int read_a_char(void)
@@ -277,7 +266,7 @@ void init_resource_track(struct resource_track *track, io_channel channel)
 #endif
 	io_stats io_start = 0;
 
-	track->brk_start = sbrk(0);
+	track->brk_start = 0;
 	gettimeofday(&track->time_start, 0);
 #ifdef HAVE_GETRUSAGE
 #ifdef sun
@@ -334,18 +323,7 @@ void print_resource_track(e2fsck_t ctx, const char *desc,
 	if (desc)
 		printf("%s: ", desc);
 
-#ifdef HAVE_MALLINFO
-#define kbytes(x)	(((unsigned long)(x) + 1023) / 1024)
 
-	malloc_info = mallinfo();
-	printf(_("Memory used: %luk/%luk (%luk/%luk), "),
-	       kbytes(malloc_info.arena), kbytes(malloc_info.hblkhd),
-	       kbytes(malloc_info.uordblks), kbytes(malloc_info.fordblks));
-#else
-	printf(_("Memory used: %lu, "),
-	       (unsigned long) (((char *) sbrk(0)) -
-				((char *) track->brk_start)));
-#endif
 #ifdef HAVE_GETRUSAGE
 	getrusage(RUSAGE_SELF, &r);
 

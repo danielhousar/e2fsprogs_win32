@@ -215,14 +215,14 @@ int e2fsck_pass1_check_symlink(ext2_filsys fs, ext2_ino_t ino,
 		if (io_channel_read_blk64(fs->io, inode->i_block[0], 1, buf))
 			return 0;
 
-		len = strnlen(buf, fs->blocksize);
+		len = e2_strnlen(buf, fs->blocksize);
 		if (len == fs->blocksize)
 			return 0;
 	} else {
 		if (inode->i_size >= sizeof(inode->i_block))
 			return 0;
 
-		len = strnlen((char *)inode->i_block, sizeof(inode->i_block));
+		len = e2_strnlen((char *)inode->i_block, sizeof(inode->i_block));
 		if (len == sizeof(inode->i_block))
 			return 0;
 	}
@@ -419,14 +419,14 @@ static void check_is_really_dir(e2fsck_t ctx, struct problem_context *pctx,
 	    LINUX_S_ISLNK(inode->i_mode) || inode->i_block[0] == 0)
 		return;
 
-	/* 
+	/*
 	 * Check the block numbers in the i_block array for validity:
 	 * zero blocks are skipped (but the first one cannot be zero -
 	 * see above), other blocks are checked against the first and
 	 * max data blocks (from the the superblock) and against the
 	 * block bitmap. Any invalid block found means this cannot be
 	 * a directory.
-	 * 
+	 *
 	 * If there are non-zero blocks past the fourth entry, then
 	 * this cannot be a device file: we remember that for the next
 	 * check.
@@ -980,7 +980,7 @@ void e2fsck_pass1(e2fsck_t ctx)
 		if (inode->i_faddr || frag || fsize ||
 		    (LINUX_S_ISDIR(inode->i_mode) && inode->i_dir_acl))
 			mark_inode_bad(ctx, ino);
-		if (!(fs->super->s_feature_incompat & 
+		if (!(fs->super->s_feature_incompat &
 		      EXT4_FEATURE_INCOMPAT_64BIT) &&
 		    inode->osd2.linux2.l_i_file_acl_high != 0)
 			mark_inode_bad(ctx, ino);

@@ -663,7 +663,7 @@ static void salvage_directory(ext2_filsys fs,
 	    ((int) rec_len + left > 8) &&
 	    (name_len + 8 <= (int) rec_len + left) &&
 	    dirent->inode <= fs->super->s_inodes_count &&
-	    strnlen(dirent->name, name_len) == name_len) {
+	    e2_strnlen(dirent->name, name_len) == name_len) {
 		(void) ext2fs_set_rec_len(fs, (int) rec_len + left, dirent);
 		return;
 	}
@@ -1007,7 +1007,7 @@ out_htree:
 			}
 		}
 
-		/* 
+		/*
 		 * Offer to clear unused inodes; if we are going to be
 		 * restarting the scan due to bg_itable_unused being
 		 * wrong, then don't clear any inodes to avoid zapping
@@ -1353,7 +1353,7 @@ extern int e2fsck_process_bad_inode(e2fsck_t ctx, ext2_ino_t dir,
 		}
 	}
 
-	if (!(fs->super->s_feature_incompat & 
+	if (!(fs->super->s_feature_incompat &
 	     EXT4_FEATURE_INCOMPAT_64BIT) &&
 	    inode.osd2.linux2.l_i_file_acl_high != 0) {
 		pctx.num = inode.osd2.linux2.l_i_file_acl_high;

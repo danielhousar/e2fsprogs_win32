@@ -363,11 +363,6 @@ struct e2fsck_struct {
 typedef __u32 region_addr_t;
 typedef struct region_struct *region_t;
 
-#ifndef HAVE_STRNLEN
-#define strnlen(str, x) e2fsck_strnlen((str),(x))
-extern int e2fsck_strnlen(const char * s, int count);
-#endif
-
 /*
  * Procedure declarations
  */

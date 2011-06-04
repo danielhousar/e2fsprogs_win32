@@ -104,9 +104,8 @@
 #define THREAD_LOCAL static
 #endif
 
-#if defined(__linux__) && defined(__NR_gettid) && defined(HAVE_JRAND48)
-#define DO_JRAND_MIX
-THREAD_LOCAL unsigned short jrand_seed[3];
+#ifndef OPEN_MAX
+#define OPEN_MAX 4
 #endif
 
 #ifdef _WIN32
@@ -302,8 +301,7 @@ static int get_node_id(unsigned char *node_id)
 /* Assume that the gettimeofday() has microsecond granularity */
 #define MAX_ADJUSTMENT 10
 
-static int get_clock(uint32_t *clock_high, uint32_t *clock_low,
-		     uint16_t *ret_clock_seq, int *num)
+static int get_clock(uint32_t *clock_high, uint32_t *clock_low, uint16_t *ret_clock_seq, int *num)
 {
 	THREAD_LOCAL int		adjustment = 0;
 	THREAD_LOCAL struct timeval	last = {0, 0};
@@ -318,8 +316,7 @@ static int get_clock(uint32_t *clock_high, uint32_t *clock_low,
 
 	if (state_fd == -2) {
 		save_umask = umask(0);
-		state_fd = open("/var/lib/libuuid/clock.txt",
-				O_RDWR|O_CREAT, 0660);
+		state_fd = open("e2uuidclock.txt", O_RDWR|O_CREAT, 0660);
 		(void) umask(save_umask);
 		state_f = fdopen(state_fd, "r+");
 		if (!state_f) {
@@ -327,11 +324,14 @@ static int get_clock(uint32_t *clock_high, uint32_t *clock_low,
 			state_fd = -1;
 		}
 	}
+	/*
 	fl.l_type = F_WRLCK;
 	fl.l_whence = SEEK_SET;
 	fl.l_start = 0;
 	fl.l_len = 0;
 	fl.l_pid = 0;
+	*/
+	/*
 	if (state_fd >= 0) {
 		rewind(state_f);
 		while (fcntl(state_fd, F_SETLKW, &fl) < 0) {
@@ -343,6 +343,7 @@ static int get_clock(uint32_t *clock_high, uint32_t *clock_low,
 			break;
 		}
 	}
+	*/
 	if (state_fd >= 0) {
 		unsigned int cl;
 		unsigned long tv1, tv2;
@@ -405,8 +406,10 @@ try_again:
 			fflush(state_f);
 		}
 		rewind(state_f);
+		/*
 		fl.l_type = F_UNLCK;
 		fcntl(state_fd, F_SETLK, &fl);
+		*/
 	}
 
 	*clock_high = clock_reg >> 32;
@@ -446,18 +449,7 @@ static void close_all_fds(void)
 {
 	int i, max;
 
-#if defined(HAVE_SYSCONF) && defined(_SC_OPEN_MAX)
-	max = sysconf(_SC_OPEN_MAX);
-#elif defined(HAVE_GETDTABLESIZE)
-	max = getdtablesize();
-#elif defined(HAVE_GETRLIMIT) && defined(RLIMIT_NOFILE)
-	struct rlimit rl;
-
-	getrlimit(RLIMIT_NOFILE, &rl);
-	max = rl.rlim_cur;
-#else
 	max = OPEN_MAX;
-#endif
 
 	for (i=0; i < max; i++) {
 		close(i);
@@ -472,81 +464,7 @@ static void close_all_fds(void)
  *
  * Returns 0 on success, non-zero on failure.
  */
-static int get_uuid_via_daemon(int op, e2uuid_t out, int *num)
-{
-#if defined(USE_UUIDD) && defined(HAVE_SYS_UN_H)
-	char op_buf[64];
-	int op_len;
-	int s;
-	ssize_t ret;
-	int32_t reply_len = 0, expected = 16;
-	struct sockaddr_un srv_addr;
-	struct stat st;
-	pid_t pid;
-	static const char *uuidd_path = UUIDD_PATH;
-	static int access_ret = -2;
-	static int start_attempts = 0;
-
-	if ((s = socket(AF_UNIX, SOCK_STREAM, 0)) < 0)
-		return -1;
-
-	srv_addr.sun_family = AF_UNIX;
-	strcpy(srv_addr.sun_path, UUIDD_SOCKET_PATH);
-
-	if (connect(s, (const struct sockaddr *) &srv_addr,
-		    sizeof(struct sockaddr_un)) < 0) {
-		if (access_ret == -2)
-			access_ret = access(uuidd_path, X_OK);
-		if (access_ret == 0)
-			access_ret = stat(uuidd_path, &st);
-		if (access_ret == 0 && (st.st_mode & (S_ISUID | S_ISGID)) == 0)
-			access_ret = access(UUIDD_DIR, W_OK);
-		if (access_ret == 0 && start_attempts++ < 5) {
-			if ((pid = fork()) == 0) {
-				close_all_fds();
-				execl(uuidd_path, "uuidd", "-qT", "300",
-				      (char *) NULL);
-				exit(1);
-			}
-			(void) waitpid(pid, 0, 0);
-			if (connect(s, (const struct sockaddr *) &srv_addr,
-				    sizeof(struct sockaddr_un)) < 0)
-				goto fail;
-		} else
-			goto fail;
-	}
-	op_buf[0] = op;
-	op_len = 1;
-	if (op == UUIDD_OP_BULK_TIME_UUID) {
-		memcpy(op_buf+1, num, sizeof(*num));
-		op_len += sizeof(*num);
-		expected += sizeof(*num);
-	}
-
-	ret = write(s, op_buf, op_len);
-	if (ret < 1)
-		goto fail;
-
-	ret = read_all(s, (char *) &reply_len, sizeof(reply_len));
-	if (ret < 0)
-		goto fail;
-
-	if (reply_len != expected)
-		goto fail;
-
-	ret = read_all(s, op_buf, reply_len);
-
-	if (op == UUIDD_OP_BULK_TIME_UUID)
-		memcpy(op_buf+16, num, sizeof(int));
-
-	memcpy(out, op_buf, 16);
-
-	close(s);
-	return ((ret == expected) ? 0 : -1);
-
-fail:
-	close(s);
-#endif
+static int get_uuid_via_daemon(int op, e2uuid_t out, int *num) {
 	return -1;
 }
 
