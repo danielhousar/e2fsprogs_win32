@@ -29,10 +29,10 @@
 #pragma warning(disable:4214) // nonstandard extension used : bit field types other than int
 #pragma warning(disable:4115) // named type definition in parentheses
 
-#include <ntddk.h>
-#include <ntdddisk.h>
-#include <ntstatus.h>
-
+#include <ddk/ntddk.h>
+#include <ddk/ntdddisk.h>
+#include <ddk/ntstatus.h>
+#include <windows.h>
 #pragma warning(pop)
 
 
@@ -40,46 +40,25 @@
 // Some native APIs.
 //
 
-NTSYSAPI
-ULONG
-NTAPI
-RtlNtStatusToDosError(
-    IN NTSTATUS Status
-   );
+ULONG NTAPI RtlNtStatusToDosError(IN NTSTATUS Status);
 
-NTSYSAPI
-NTSTATUS
-NTAPI
-NtClose(
-    IN HANDLE Handle
-   );
+//NTSTATUS NTAPI NtClose(IN HANDLE Handle);
 
 
-NTSYSAPI
-NTSTATUS
-NTAPI
-NtOpenFile(
+NTSTATUS NTAPI NtOpenFile(
     OUT PHANDLE FileHandle,
     IN ACCESS_MASK DesiredAccess,
     IN POBJECT_ATTRIBUTES ObjectAttributes,
     OUT PIO_STATUS_BLOCK IoStatusBlock,
     IN ULONG ShareAccess,
-    IN ULONG OpenOptions
-    );
+    IN ULONG OpenOptions);
 
-NTSYSAPI
-NTSTATUS
-NTAPI
-NtFlushBuffersFile(
+NTSTATUS NTAPI NtFlushBuffersFile(
     IN HANDLE FileHandle,
-    OUT PIO_STATUS_BLOCK IoStatusBlock
-   );
+    OUT PIO_STATUS_BLOCK IoStatusBlock);
 
 
-NTSYSAPI
-NTSTATUS
-NTAPI
-NtReadFile(
+NTSTATUS NTAPI NtReadFile(
     IN HANDLE FileHandle,
     IN HANDLE Event OPTIONAL,
     IN PIO_APC_ROUTINE ApcRoutine OPTIONAL,
@@ -88,13 +67,9 @@ NtReadFile(
     OUT PVOID Buffer,
     IN ULONG Length,
     IN PLARGE_INTEGER ByteOffset OPTIONAL,
-    IN PULONG Key OPTIONAL
-    );
+    IN PULONG Key OPTIONAL);
 
-NTSYSAPI
-NTSTATUS
-NTAPI
-NtWriteFile(
+NTSTATUS NTAPI NtWriteFile(
     IN HANDLE FileHandle,
     IN HANDLE Event OPTIONAL,
     IN PIO_APC_ROUTINE ApcRoutine OPTIONAL,
@@ -103,13 +78,9 @@ NtWriteFile(
     IN PVOID Buffer,
     IN ULONG Length,
     IN PLARGE_INTEGER ByteOffset OPTIONAL,
-    IN PULONG Key OPTIONAL
-    );
+    IN PULONG Key OPTIONAL);
 
-NTSYSAPI
-NTSTATUS
-NTAPI
-NtDeviceIoControlFile(
+NTSTATUS NTAPI NtDeviceIoControlFile(
     IN HANDLE FileHandle,
     IN HANDLE Event OPTIONAL,
     IN PIO_APC_ROUTINE ApcRoutine OPTIONAL,
@@ -119,13 +90,9 @@ NtDeviceIoControlFile(
     IN PVOID InputBuffer OPTIONAL,
     IN ULONG InputBufferLength,
     OUT PVOID OutputBuffer OPTIONAL,
-    IN ULONG OutputBufferLength
-    );
+    IN ULONG OutputBufferLength);
 
-NTSYSAPI
-NTSTATUS
-NTAPI
-NtFsControlFile(
+NTSTATUS NTAPI NtFsControlFile(
     IN HANDLE FileHandle,
     IN HANDLE Event OPTIONAL,
     IN PIO_APC_ROUTINE ApcRoutine OPTIONAL,
@@ -135,18 +102,12 @@ NtFsControlFile(
     IN PVOID InputBuffer OPTIONAL,
     IN ULONG InputBufferLength,
     OUT PVOID OutputBuffer OPTIONAL,
-    IN ULONG OutputBufferLength
-    );
+    IN ULONG OutputBufferLength);
 
 
-NTSYSAPI
-NTSTATUS
-NTAPI
-NtDelayExecution(
-    IN BOOLEAN Alertable,
-    IN PLARGE_INTEGER Interval
-    );
-
+NTSTATUS NTAPI NtDelayExecution(
+	IN BOOLEAN Alertable,
+    IN PLARGE_INTEGER Interval);
 
 #define FSCTL_LOCK_VOLUME               CTL_CODE(FILE_DEVICE_FILE_SYSTEM, 6, METHOD_BUFFERED, FILE_ANY_ACCESS)
 #define FSCTL_UNLOCK_VOLUME             CTL_CODE(FILE_DEVICE_FILE_SYSTEM, 7, METHOD_BUFFERED, FILE_ANY_ACCESS)
@@ -177,7 +138,7 @@ NtDelayExecution(
 #include <stdlib.h>
 #include <malloc.h>
 
-#include <linux/types.h>
+//#include <linux/types.h>
 #include "ext2_fs.h"
 #include <errno.h>
 
@@ -1005,12 +966,12 @@ ext2fs_check_if_mounted(const char *file, int *mount_flags)
 	}
 
 
-	__try{
+	//__try{
 		*mount_flags &= _IsMounted(h) ? EXT2_MF_MOUNTED : 0;
-	}
-	__finally{
+	//}
+	//__finally{
 		_CloseDisk(h);
-	}
+	//}
 
 	return 0;
 }
@@ -1041,7 +1002,7 @@ ext2fs_get_device_size(const char *file, int blocksize,
 		}
 
 
-		__try{
+		//__try{
 
 			//
 			// Get size
@@ -1049,10 +1010,10 @@ ext2fs_get_device_size(const char *file, int blocksize,
 
 			_GetDeviceSize(h, &FsSize);
 			strcpy(knowndevice, file);
-		}
-		__finally{
+		//}
+		//__finally{
 			_CloseDisk(h);
-		}
+		//}
 
 	}
 
@@ -1088,7 +1049,7 @@ nt_open(const char *name, int flags, io_channel *channel)
 		return EXT2_ET_BAD_DEVICE_NAME;
 	}
 
-	__try{
+	//__try{
 
 		//
 		// Allocate channel handle
@@ -1099,7 +1060,7 @@ nt_open(const char *name, int flags, io_channel *channel)
 		if (NULL == io)
 		{
 			Errno = ENOMEM;
-			__leave;
+			//__leave;
 		}
 
 		RtlZeroMemory(io, sizeof(struct struct_io_channel));
@@ -1110,7 +1071,7 @@ nt_open(const char *name, int flags, io_channel *channel)
 		if (NULL == NtData)
 		{
 			Errno = ENOMEM;
-			__leave;
+			//__leave;
 		}
 
 
@@ -1119,7 +1080,7 @@ nt_open(const char *name, int flags, io_channel *channel)
 		if (NULL == io->name)
 		{
 			Errno = ENOMEM;
-			__leave;
+			//__leave;
 		}
 
 		strcpy(io->name, name);
@@ -1143,7 +1104,7 @@ nt_open(const char *name, int flags, io_channel *channel)
 		if (NULL == NtData->Buffer)
 		{
 			Errno = ENOMEM;
-			__leave;
+			//__leave;
 		}
 
 		//
@@ -1152,7 +1113,7 @@ nt_open(const char *name, int flags, io_channel *channel)
 
 		if(!_Ext2OpenDevice(name, (BOOLEAN)!BooleanFlagOn(flags, EXT2_FLAG_RW), &NtData->Handle, &NtData->OpenedReadonly, &Errno))
 		{
-			__leave;
+			//__leave;
 		}
 
 
@@ -1180,8 +1141,8 @@ nt_open(const char *name, int flags, io_channel *channel)
 		*channel = io;
 
 
-	}
-	__finally{
+	//}
+	//__finally{
 
 		if(0 != Errno)
 		{
@@ -1207,7 +1168,7 @@ nt_open(const char *name, int flags, io_channel *channel)
 				free(NtData);
 			}
 		}
-	}
+	//}
 
 	return Errno;
 }

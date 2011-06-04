@@ -21,20 +21,19 @@ TODO:
 	- make mke2fs and e2fsck compatible with NT disk-IO ABI
 	- test mke2fs if making Ext4fs on partition correctly
 
-Compillable by MinGW GCC (>= 4.4.0) under Msys environment (Win32 + Bash + unix paths):
+Compillable by MinGW GCC (>= 4.4.0) under Msys environment (Win32 + Bash):
 
 	lib/e2p:	libe2p.a
 	lib/et:		libcomm_err.a
 	lib/ext2fs:	libext2fs.a
 	lib/blkid:	libblkid.a
-	e2fsck:		*.o
-	misc:		mke2fs
-
-Substitute binaries:
-	(origin) - (substitute)
-	lib/uuid: libuuid.a - MinGW: libuuid.a
+	lib/uuid:	libuuid.a
+	e2fsck:		e2fsck.o
+	misc:		mke2fs.o
 
 Linkable (with no missing symbols):
+
+Running (executable):
 
 Working (with no runtime errors):
 
