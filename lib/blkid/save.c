@@ -63,7 +63,7 @@ int blkid_flush_cache(blkid_cache cache)
 	FILE *file = NULL;
 	int fd, ret = 0;
 	struct stat st;
-
+/*
 	if (!cache)
 		return -BLKID_ERR_PARAM;
 
@@ -74,15 +74,16 @@ int blkid_flush_cache(blkid_cache cache)
 	}
 
 	filename = cache->bic_filename ? cache->bic_filename: BLKID_CACHE_FILE;
-
+*/
 	/* If we can't write to the cache file, then don't even try */
+/*
 	if (((ret = stat(filename, &st)) < 0 && errno != ENOENT) ||
 	    (ret == 0 && access(filename, W_OK) < 0)) {
 		DBG(DEBUG_SAVE,
 		    printf("can't write to cache file %s\n", filename));
 		return 0;
 	}
-
+*/
 	/*
 	 * Try and create a temporary file in the same directory so
 	 * that in case of error we don't overwrite the cache file.
@@ -90,6 +91,7 @@ int blkid_flush_cache(blkid_cache cache)
 	 * file (e.g. /dev/null or a socket), or we couldn't create
 	 * a temporary file then we open it directly.
 	 */
+/*
 	if (ret == 0 && S_ISREG(st.st_mode)) {
 		tmp = malloc(strlen(filename) + 8);
 		if (tmp) {
@@ -155,6 +157,9 @@ int blkid_flush_cache(blkid_cache cache)
 errout:
 	free(tmp);
 	return ret;
+*/
+	DBG(DEBUG_SAVE, printf("can't write to cache file %s\n", filename));
+	return 0;
 }
 
 #ifdef TEST_PROGRAM
