@@ -184,6 +184,7 @@ BSDLIB_INSTALL_DIR = $(root_libdir)
 
 all:: ext2fs.pc
 
+#.c.o: nt_io
 .c.o:
 	$(E) "	CC $<"
 	$(Q) $(CC) $(ALL_CFLAGS) -c $< -o $@
@@ -191,6 +192,10 @@ all:: ext2fs.pc
 @CHECKER_CMT@	$(Q) $(CC) $(ALL_CFLAGS) -checker -g -o checker/$*.o -c $<
 @ELF_CMT@	$(Q) $(CC) $(ALL_CFLAGS) -fPIC -o elfshared/$*.o -c $<
 @BSDLIB_CMT@	$(Q) $(CC) $(ALL_CFLAGS) $(BSDLIB_PIC_FLAG) -o pic/$*.o -c $<
+
+#nt_io:
+#	$(E) "	CC nt_io.o"
+#	$(Q) $(CC) $(ALL_CFLAGS) -c nt_io.c -o nt_io.o
 
 COMPILE_ET=../et/compile_et --build-tree
 
