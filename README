@@ -32,6 +32,9 @@ Compillable by MinGW GCC (>= 4.4.0) under Msys environment (Win32 + Bash):
 	misc:		mke2fs.o
 
 Linkable (with no missing symbols):
+	libe2p.a
+	libcomm_err.a
+	libuuid.a
 
 Running (executable):
 
