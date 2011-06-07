@@ -278,7 +278,7 @@ static dev_t lvm_get_devno(const char *lvm_device)
 	char buf[1024];
 	int ma, mi;
 	dev_t ret = 0;
-
+/*
 	DBG(DEBUG_DEVNAME, printf("opening %s\n", lvm_device));
 	if ((lvf = fopen(lvm_device, "r")) == NULL) {
 		DBG(DEBUG_DEVNAME, printf("%s: (%d) %s\n", lvm_device, errno,
@@ -293,7 +293,7 @@ static dev_t lvm_get_devno(const char *lvm_device)
 		}
 	}
 	fclose(lvf);
-
+*/
 	return ret;
 }
 
@@ -361,8 +361,7 @@ exit:
 
 #define PROC_EVMS_VOLUMES "/proc/evms/volumes"
 
-static int
-evms_probe_all(blkid_cache cache, int only_if_new)
+static int evms_probe_all(blkid_cache cache, int only_if_new)
 {
 	char line[100];
 	int ma, mi, sz, num = 0;

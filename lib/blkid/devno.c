@@ -122,7 +122,7 @@ void blkid__scan_dir(char *dirname, dev_t devno, struct dir_list **list,
 				   path, *devname));
 			break;
 		}
-		if (list && S_ISDIR(st.st_mode) && !lstat(path, &st) &&
+		if (list && S_ISDIR(st.st_mode) && !_stat(path, &st) &&
 		    S_ISDIR(st.st_mode))
 			add_to_dirlist(path, list);
 	}
