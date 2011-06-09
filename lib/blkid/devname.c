@@ -367,7 +367,7 @@ static int evms_probe_all(blkid_cache cache, int only_if_new)
 	int ma, mi, sz, num = 0;
 	FILE *procpt;
 	char device[110];
-
+/*
 	procpt = fopen(PROC_EVMS_VOLUMES, "r");
 	if (!procpt)
 		return 0;
@@ -385,6 +385,8 @@ static int evms_probe_all(blkid_cache cache, int only_if_new)
 	}
 	fclose(procpt);
 	return num;
+*/
+	return 0;
 }
 
 /*
@@ -431,7 +433,7 @@ static int probe_all(blkid_cache cache, int only_if_new)
 		if (sscanf(line, " %d %d %llu %128[^\n ]",
 			   &ma, &mi, &sz, ptname) != 4)
 			continue;
-		devs[which] = makedev(ma, mi);
+		//devs[which] = makedev(ma, mi);
 
 		DBG(DEBUG_DEVNAME, printf("read partition name %s\n", ptname));
 
