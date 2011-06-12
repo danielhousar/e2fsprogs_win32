@@ -207,7 +207,7 @@ struct struct_ext2_filsys {
 	char *				device_name;
 	struct ext2_super_block	* 	super;
 	unsigned int			blocksize;
-	int				clustersize;
+	int				cluster_ratio_bits;
 	dgrp_t				group_desc_count;
 	unsigned long			desc_blocks;
 	struct opaque_ext2_group_desc *	group_desc;
@@ -553,7 +553,8 @@ typedef struct ext2_icount *ext2_icount_t;
 					 EXT2_FEATURE_RO_COMPAT_LARGE_FILE|\
 					 EXT4_FEATURE_RO_COMPAT_DIR_NLINK|\
 					 EXT4_FEATURE_RO_COMPAT_EXTRA_ISIZE|\
-					 EXT4_FEATURE_RO_COMPAT_GDT_CSUM)
+					 EXT4_FEATURE_RO_COMPAT_GDT_CSUM|\
+					 EXT4_FEATURE_RO_COMPAT_BIGALLOC)
 
 /*
  * These features are only allowed if EXT2_FLAG_SOFTSUPP_FEATURES is passed
@@ -561,6 +562,17 @@ typedef struct ext2_icount *ext2_icount_t;
  */
 #define EXT2_LIB_SOFTSUPP_INCOMPAT	(0)
 #define EXT2_LIB_SOFTSUPP_RO_COMPAT	(EXT4_FEATURE_RO_COMPAT_BIGALLOC)
+
+
+/* Translate a block number to a cluster number */
+#define EXT2FS_CLUSTER_RATIO(fs)	(1 << (fs)->cluster_ratio_bits)
+#define EXT2FS_CLUSTER_MASK(fs)		(EXT2FS_CLUSTER_RATIO(fs) - 1)
+#define EXT2FS_B2C(fs, blk)		((blk) >> (fs)->cluster_ratio_bits)
+/* Translate a cluster number to a block number */
+#define EXT2FS_C2B(fs, cluster)		((cluster) << (fs)->cluster_ratio_bits)
+/* Translate # of blks to # of clusters */
+#define EXT2FS_NUM_B2C(fs, blks)	(((blks) + EXT2FS_CLUSTER_MASK(fs)) >> \
+					 (fs)->cluster_ratio_bits)
 
 /*
  * function prototypes
@@ -675,6 +687,10 @@ extern errcode_t ext2fs_read_block_bitmap(ext2_filsys fs);
 extern errcode_t ext2fs_allocate_block_bitmap(ext2_filsys fs,
 					      const char *descr,
 					      ext2fs_block_bitmap *ret);
+extern errcode_t ext2fs_allocate_subcluster_bitmap(ext2_filsys fs,
+						   const char *descr,
+						   ext2fs_block_bitmap *ret);
+extern int ext2fs_get_bitmap_granularity(ext2fs_block_bitmap bitmap);
 extern errcode_t ext2fs_allocate_inode_bitmap(ext2_filsys fs,
 					      const char *descr,
 					      ext2fs_inode_bitmap *ret);
@@ -1107,6 +1123,8 @@ errcode_t ext2fs_get_generic_bmap_range(ext2fs_generic_bitmap bmap,
 errcode_t ext2fs_set_generic_bmap_range(ext2fs_generic_bitmap bmap,
 					__u64 start, unsigned int num,
 					void *in);
+errcode_t ext2fs_convert_subcluster_bitmap(ext2_filsys fs,
+					   ext2fs_block_bitmap *bitmap);
 
 /* getsize.c */
 extern errcode_t ext2fs_get_device_size(const char *file, int blocksize,
@@ -1407,11 +1425,37 @@ _INLINE_ errcode_t ext2fs_get_memalign(size_t size,
 	return 0;
 }
 
+_INLINE_ errcode_t ext2fs_get_memzero(unsigned long size, void *ptr)
+{
+	void *pp;
+
+	pp = malloc(size);
+	if (!pp)
+		return EXT2_ET_NO_MEMORY;
+	memset(pp, 0, size);
+	memcpy(ptr, &pp, sizeof(pp));
+	return 0;
+}
+
 _INLINE_ errcode_t ext2fs_get_array(unsigned long count, unsigned long size, void *ptr)
 {
 	if (count && (-1UL)/count<size)
-		return EXT2_ET_NO_MEMORY; //maybe define EXT2_ET_OVERFLOW ?
+		return EXT2_ET_NO_MEMORY;
 	return ext2fs_get_mem(count*size, ptr);
+}
+
+_INLINE_ errcode_t ext2fs_get_arrayzero(unsigned long count,
+					unsigned long size, void *ptr)
+{
+	void *pp;
+
+	if (count && (-1UL)/count<size)
+		return EXT2_ET_NO_MEMORY;
+	pp = calloc(count, size);
+	if (!pp)
+		return EXT2_ET_NO_MEMORY;
+	memcpy(ptr, &pp, sizeof(pp));
+	return 0;
 }
 
 /*

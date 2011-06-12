@@ -298,7 +298,7 @@ _("Warning: the backup superblock/group descriptors at block %u contain\n"
 		exit(1);
 	}
 	while (ext2fs_badblocks_list_iterate(bb_iter, &blk))
-		ext2fs_mark_block_bitmap2(fs->block_map, blk);
+		ext2fs_mark_block_bitmap2(fs->block_map, EXT2FS_B2C(fs, blk));
 	ext2fs_badblocks_list_iterate_end(bb_iter);
 }
 
@@ -563,9 +563,10 @@ static void show_stats(ext2_filsys fs)
 	if (EXT2_HAS_RO_COMPAT_FEATURE(fs->super,
 				       EXT4_FEATURE_RO_COMPAT_BIGALLOC))
 		printf(_("Cluster size=%u (log=%u)\n"),
-		       fs->clustersize, s->s_log_cluster_size);
+		       fs->blocksize << fs->cluster_ratio_bits,
+		       s->s_log_cluster_size);
 	else
-		printf(_("Fragment size=%u (log=%u)\n"), fs->clustersize,
+		printf(_("Fragment size=%u (log=%u)\n"), EXT2_CLUSTER_SIZE(s),
 		       s->s_log_cluster_size);
 	printf(_("Stride=%u blocks, Stripe width=%u blocks\n"),
 	       s->s_raid_stride, s->s_raid_stripe_width);
@@ -815,7 +816,8 @@ static __u32 ok_features[3] = {
 		EXT4_FEATURE_RO_COMPAT_DIR_NLINK|
 		EXT4_FEATURE_RO_COMPAT_EXTRA_ISIZE|
 		EXT2_FEATURE_RO_COMPAT_SPARSE_SUPER|
-		EXT4_FEATURE_RO_COMPAT_GDT_CSUM
+		EXT4_FEATURE_RO_COMPAT_GDT_CSUM|
+		EXT4_FEATURE_RO_COMPAT_BIGALLOC
 };
 
 
@@ -1147,8 +1149,11 @@ static int get_device_geometry(const char *file,
 	if ((opt_io == 0) && (psector_size > blocksize))
 		opt_io = psector_size;
 
-	fs_param->s_raid_stride = min_io / blocksize;
-	fs_param->s_raid_stripe_width = opt_io / blocksize;
+	/* setting stripe/stride to blocksize is pointless */
+	if (min_io > blocksize)
+		fs_param->s_raid_stride = min_io / blocksize;
+	if (opt_io > blocksize)
+		fs_param->s_raid_stripe_width = opt_io / blocksize;
 
 	rc = blkid_topology_get_alignment_offset(tp);
 out:
@@ -1264,7 +1269,7 @@ profile_error:
 	}
 
 	while ((c = getopt (argc, argv,
-		    "b:cf:g:G:i:jl:m:no:qr:s:t:vE:FI:J:KL:M:N:O:R:ST:U:V")) != EOF) {
+		    "b:cg:i:jl:m:no:qr:s:t:vC:E:FG:I:J:KL:M:N:O:R:ST:U:V")) != EOF) {
 		switch (c) {
 		case 'b':
 			blocksize = strtol(optarg, &tmp, 0);
@@ -1287,17 +1292,17 @@ profile_error:
 		case 'c':	/* Check for bad blocks */
 			cflag++;
 			break;
-		case 'f':
+		case 'C':
 			size = strtoul(optarg, &tmp, 0);
-			if (size < EXT2_MIN_BLOCK_SIZE ||
-			    size > EXT2_MAX_BLOCK_SIZE || *tmp) {
+			if (size < EXT2_MIN_CLUSTER_SIZE ||
+			    size > EXT2_MAX_CLUSTER_SIZE || *tmp) {
 				com_err(program_name, 0,
 					_("invalid fragment size - %s"),
 					optarg);
 				exit(1);
 			}
-			fprintf(stderr, _("Warning: fragments not supported.  "
-			       "Ignoring -f option\n"));
+			fs_param.s_log_cluster_size =
+				int_log2(size >> EXT2_MIN_CLUSTER_LOG_SIZE);
 			break;
 		case 'g':
 			fs_param.s_blocks_per_group = strtoul(optarg, &tmp, 0);
@@ -1526,8 +1531,6 @@ profile_error:
 	if (!force)
 		check_plausibility(device_name);
 	check_mount(device_name, force, _("filesystem"));
-
-	fs_param.s_log_cluster_size = fs_param.s_log_block_size;
 
 	/* Determine the size of the device (if possible) */
 	if (noaction && fs_blocks_count) {
@@ -1776,15 +1779,23 @@ profile_error:
 		}
 	}
 
+	fs_param.s_log_block_size =
+		int_log2(blocksize >> EXT2_MIN_BLOCK_LOG_SIZE);
+	if (fs_param.s_feature_ro_compat & EXT4_FEATURE_RO_COMPAT_BIGALLOC) {
+		if (fs_param.s_log_cluster_size == 0)
+			fs_param.s_log_cluster_size =
+				fs_param.s_log_block_size + 4;
+	} else
+		fs_param.s_log_cluster_size = fs_param.s_log_block_size;
+
 	if (inode_ratio == 0) {
 		inode_ratio = get_int_from_profile(fs_types, "inode_ratio",
 						   8192);
 		if (inode_ratio < blocksize)
 			inode_ratio = blocksize;
+		if (inode_ratio < EXT2_CLUSTER_SIZE(&fs_param))
+			inode_ratio = EXT2_CLUSTER_SIZE(&fs_param);
 	}
-
-	fs_param.s_log_cluster_size = fs_param.s_log_block_size =
-		int_log2(blocksize >> EXT2_MIN_BLOCK_LOG_SIZE);
 
 #ifdef HAVE_BLKID_PROBE_GET_TOPOLOGY
 	retval = get_device_geometry(device_name, &fs_param, psector_size);
@@ -2073,6 +2084,33 @@ static int mke2fs_discard_device(ext2_filsys fs)
 	return retval;
 }
 
+static fix_cluster_bg_counts(ext2_filsys fs)
+{
+	blk64_t	cluster, num_clusters, tot_free;
+	int	grp_free, num_free, group, num;
+
+	num_clusters = EXT2FS_B2C(fs, ext2fs_blocks_count(fs->super));
+	tot_free = num_free = num = group = grp_free = 0;
+	for (cluster = EXT2FS_B2C(fs, fs->super->s_first_data_block);
+	     cluster < num_clusters; cluster++) {
+		if (!ext2fs_test_block_bitmap2(fs->block_map,
+					       EXT2FS_C2B(fs, cluster))) {
+			grp_free++;
+			tot_free++;
+		}
+		num++;
+		if ((num == fs->super->s_clusters_per_group) ||
+		    (cluster == num_clusters-1)) {
+			ext2fs_bg_free_blocks_count_set(fs, group, grp_free);
+			ext2fs_group_desc_csum_set(fs, group);
+			num = 0;
+			grp_free = 0;
+			group++;
+		}
+	}
+	ext2fs_free_blocks_count_set(fs->super, tot_free);
+}
+
 int main (int argc, char *argv[])
 {
 	errcode_t	retval = 0;
@@ -2132,7 +2170,7 @@ int main (int argc, char *argv[])
 	}
 
 	/* Can't undo discard ... */
-	if (discard && (io_ptr != undo_io_manager)) {
+	if (!noaction && discard && (io_ptr != undo_io_manager)) {
 		retval = mke2fs_discard_device(fs);
 		if (!retval && io_channel_discard_zeroes_data(fs->io)) {
 			if (verbose)
@@ -2279,6 +2317,14 @@ int main (int argc, char *argv[])
 	}
 	if (!quiet)
 		printf(_("done                            \n"));
+
+	retval = ext2fs_convert_subcluster_bitmap(fs, &fs->block_map);
+	if (retval) {
+		com_err(program_name, retval,
+			_("\n\twhile converting subcluster bitmap"));
+		exit(1);
+	}
+
 	if (super_only) {
 		fs->super->s_state |= EXT2_ERROR_FS;
 		fs->flags &= ~(EXT2_FLAG_IB_DIRTY|EXT2_FLAG_BB_DIRTY);
@@ -2391,6 +2437,9 @@ int main (int argc, char *argv[])
 	}
 no_journal:
 
+	if (EXT2_HAS_RO_COMPAT_FEATURE(&fs_param,
+				       EXT4_FEATURE_RO_COMPAT_BIGALLOC))
+		fix_cluster_bg_counts(fs);
 	if (!quiet)
 		printf(_("Writing superblocks and "
 		       "filesystem accounting information: "));
