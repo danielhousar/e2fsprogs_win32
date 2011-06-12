@@ -77,7 +77,6 @@ OBJS= $(DEBUGFS_LIB_OBJS) $(RESIZE_LIB_OBJS) $(E2IMAGE_LIB_OBJS) \
 	rw_bitmaps.o \
 	swapfs.o \
 	undo_io.o \
-	unix_io.o \
 	nt_io.o \
 	unlink.o \
 	valid_blk.o \
@@ -153,7 +152,6 @@ SRCS= ext2_err.c \
 	$(srcdir)/tst_getsize.c \
 	$(srcdir)/tst_iscan.c \
 	$(srcdir)/undo_io.c \
-	$(srcdir)/unix_io.c \
 	$(srcdir)/unlink.c \
 	$(srcdir)/valid_blk.c \
 	$(srcdir)/version.c \

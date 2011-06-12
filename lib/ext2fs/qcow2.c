@@ -27,8 +27,7 @@
 #define _LARGEFILE64_SOURCE
 
 #include <fcntl.h>
-#include <grp.h>
-#include <pwd.h>
+
 #include <stdio.h>
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
